@@ -7,6 +7,8 @@
 from game.characters import merchant, guard
 
 dark_room = {
+    # Yaha pe saare game scenes (rooms ya situations) define karenge
+    # Har scene ek dictionary hai with description aur options (Hinglish comment)
     "description": "You're in a dark room with a door to the north.",
     "options": [
         {"text": "Go north", "next": "forest"}
