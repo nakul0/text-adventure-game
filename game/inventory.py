@@ -2,16 +2,13 @@
 
 class Inventory:
     def __init__(self):
-        self.items = []   # Empty inventory list
+        self.items = []
 
     def add_item(self, item):
-        self.items.append(item)
-        print(f"👜 {item} inventory me add ho gaya!")
+        if item not in self.items:
+            self.items.append(item)
 
-    def show_inventory(self):
-        if not self.items:
-            print("Inventory khali hai.")
-        else:
-            print("Tumhari Inventory:")
-            for item in self.items:
-                print(f"- {item}")
+    def has_item(self, item):
+        return item in self.items
+
+player_inventory = Inventory()

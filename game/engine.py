@@ -1,42 +1,54 @@
 # Engine file: yaha pe main game loop chalega
 # Isme hum user input lenge aur scenes switch karenge
 
-from game import scenes
+from game.scenes import scenes
+from game.inventory import player_inventory
 
 class Game:
     def __init__(self):
-        self.current_scene = scenes.start_scene   # Starting scene set kiya
-        self.is_running = True                    # Game chal raha hai ya nahi
-        self.inventory = []                       # Player ka inventory list
+        self.current_scene = scenes["dark_room"]
+        self.game_over = False
 
-    def start(self):
-        print("🎮 Welcome to the Text Adventure Game!")
-        print("Type 'quit' to exit.\n")
+    def run(self):
+        while not self.game_over:
+            self.display_scene()
+            choice = self.get_player_choice()
+            self.process_choice(choice)
 
-        # Jab tak game chal raha hai, har turn chalti rahegi
-        while self.is_running:
-            self.play_turn()
-
-    def play_turn(self):
-        # Scene ka description print karo
-        print(self.current_scene["description"])
-
-        # Options print karo
+    def display_scene(self):
+        print("\n" + self.current_scene["description"])
+        if "items" in self.current_scene:
+            print(f"You see: {', '.join(self.current_scene['items'])}")
+        if "npcs" in self.current_scene:
+            for npc in self.current_scene["npcs"]:
+                print(npc.description)
         for i, option in enumerate(self.current_scene["options"], 1):
             print(f"{i}. {option['text']}")
 
-        # User input lo
-        choice = input("\nType here: ").strip().lower()
+    def get_player_choice(self):
+        return input("\nEnter choice: ").lower()
 
+    def process_choice(self, choice):
         if choice == "quit":
-            self.is_running = False
-            print("\n👋 Thanks for playing!")
+            print("Thanks for playing!")
+            self.game_over = True
             return
-
-        # User choice handle karo
         try:
             choice_idx = int(choice) - 1
-            selected_option = self.current_scene["options"][choice_idx]
-            self.current_scene = selected_option["next"]
-        except (ValueError, IndexError):
-            print("\n⚠️!\n")
+            if 0 <= choice_idx < len(self.current_scene["options"]):
+                option = self.current_scene["options"][choice_idx]
+                if "item_required" in option and not player_inventory.has_item(option["item_required"]):
+                    print(f"You need a {option['item_required']}!")
+                    return
+                if "add_item" in option:
+                    player_inventory.add_item(option["add_item"])
+                    print(f"Picked up: {option['add_item']}")
+                if option["next"] is None:
+                    print(option.get("end_message", "Game Over!"))
+                    self.game_over = True
+                else:
+                    self.current_scene = option["next"]
+            else:
+                print("Invalid choice.")
+        except ValueError:
+            print("Enter a number or 'quit'.")

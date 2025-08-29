@@ -4,47 +4,57 @@
 # scenes.py
 # This file defines all the scenes (rooms) of the adventure.
 
-# Final winning scene
-treasure_room = {
-    "description": "\n✨ You enter a shining treasure room filled with gold and jewels. You WIN! ✨",
+from game.characters import merchant, guard
+
+dark_room = {
+    "description": "You're in a dark room with a door to the north.",
     "options": [
-        {"text": "Quit the game", "next": None}
+        {"text": "Go north", "next": "forest"}
     ]
 }
 
-# Danger scene
-monster_room = {
-    "description": "\n👹 A scary monster appears! You try to fight but it defeats you. GAME OVER.",
+forest = {
+    "description": "A spooky forest surrounds you. Paths lead north and south.",
+    "items": ["Rusty Key"],
     "options": [
-        {"text": "Quit the game", "next": None}
+        {"text": "Pick up Rusty Key", "add_item": "Rusty Key", "next": "forest"},
+        {"text": "Go north", "next": "cave"},
+        {"text": "Go south", "next": "village"}
     ]
 }
 
-# Forest scene
-forest_scene = {
-    "description": "\n🌲 You are standing in a spooky forest. Paths lead north and east.",
+cave = {
+    "description": "A dark cave. A monster lurks inside.",
     "options": [
-        {"text": "Go north (towards treasure)", "next": treasure_room},
-        {"text": "Go east (towards danger)", "next": monster_room},
-        {"text": "Go back south (to start)", "next": None}  # optional back link
+        {"text": "Fight monster", "item_required": "Sword", "next": "village", "end_message": "You defeated the monster!"},
+        {"text": "Run away", "next": "forest", "end_message": "The monster ate you! Game Over!"}
     ]
 }
 
-# Starting scene
-start_scene = {
-    "description": "\n😴 You wake up in a dark room. There's a door to the north.",
+village = {
+    "description": "A quiet village with a merchant and a path to the castle.",
+    "npcs": [merchant],
+    "items": ["Sword"],
     "options": [
-        {"text": "Open the door", "next": forest_scene},
-        {"text": "Stay in the room", "next": None}
+        {"text": "Pick up Sword", "add_item": "Sword", "next": "village"},
+        {"text": "Go north", "next": "castle"},
+        {"text": "Go north", "next": "forest"}
     ]
 }
 
+castle = {
+    "description": "A grand castle. A guard blocks a treasure chest.",
+    "npcs": [guard],
+    "options": [
+        {"text": "Unlock chest", "item_required": "Rusty Key", "next": None, "end_message": "You found the treasure! You win!"},
+        {"text": "Talk to guard", "next": "castle", "end_message": "The guard won't let you pass."}
+    ]
+}
 
-# Example: future me aur scenes add karna
-# hallway_scene = {
-#     "description": "Aap ek hallway me enter karte ho, jisme torches lagi hai.",
-#     "options": [
-#         {"text": "Left me jao", "next": another_scene},
-#         {"text": "Right me jao", "next": yet_another_scene}
-#     ]
-# }
+scenes = {
+    "dark_room": dark_room,
+    "forest": forest,
+    "cave": cave,
+    "village": village,
+    "castle": castle
+}
